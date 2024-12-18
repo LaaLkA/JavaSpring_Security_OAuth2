@@ -1,6 +1,6 @@
-package org.laalka.authorizationserver.Repository;
+package org.laalka.authorizationserver.repositories;
 
-import org.laalka.authorizationserver.models.User;
+import org.laalka.authorizationserver.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

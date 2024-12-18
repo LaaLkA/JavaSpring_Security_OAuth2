@@ -2,8 +2,10 @@ package org.laalka.authorizationserver.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -30,18 +32,25 @@ import java.util.UUID;
 public class AuthorizationServerConfig {
 
     @Bean
+    @Order(2)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        return http.formLogin(Customizer.withDefaults()).build();
+
+        http.securityMatcher("/oauth2/**", "/.well-known/**")
+                .formLogin(Customizer.withDefaults());
+
+        return http.build();
     }
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("my-client")
-                .clientSecret("secret")
+                .clientSecret("{noop}secret")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://localhost:8082/login/oauth2/code/my-client")
                 .scope("read")
                 .build();
 
@@ -49,8 +58,21 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/login", "/error", "/register")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/error", "/register").permitAll()
+                )
+                .formLogin(Customizer.withDefaults())
+        ;
+
+        return http.build();
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

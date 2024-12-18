@@ -1,4 +1,4 @@
-package org.laalka.authorizationserver.models;
+package org.laalka.authorizationserver.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
