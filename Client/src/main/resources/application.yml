@@ -1,0 +1,17 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          my-client:
+            client-id: my-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:8082/login/oauth2/code/my-client"
+            scope: read
+            provider: my-provider
+        provider:
+          my-provider:
+            issuer-uri: http://localhost:9000
+server:
+  port: 8082
