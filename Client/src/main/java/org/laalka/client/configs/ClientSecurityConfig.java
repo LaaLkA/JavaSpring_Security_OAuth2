@@ -15,7 +15,6 @@ public class ClientSecurityConfig {
                         .requestMatchers("/", "/public/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // Включаем OAuth2 Login - при запросе к защищённому URL без токена будет редирект на AS
                 .oauth2Login(Customizer.withDefaults());
 
         return http.build();
