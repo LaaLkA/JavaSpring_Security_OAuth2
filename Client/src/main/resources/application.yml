@@ -15,5 +15,10 @@ spring:
             provider: my-provider
         provider:
           my-provider:
-            issuer-uri: http://localhost:9000
+            authorization-uri: http://localhost:9000/oauth2/authorize
+            token-uri: http://localhost:9000/oauth2/token
+            jwk-set-uri: http://localhost:9000/oauth2/jwks
 
+logging:
+  level:
+    org.springframework.security: DEBUG
